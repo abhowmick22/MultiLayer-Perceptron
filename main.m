@@ -10,6 +10,7 @@
 % layer.
 
 % Define the Perceptron Neural Network
+perceptron = MultiLayerPerceptron(2, 2, 0.01, 0.01, 0.1);
 
 
 % Read the training data
