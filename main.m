@@ -10,8 +10,9 @@
 % layer.
 
 % Define the Perceptron Neural Network
-perceptron = MultiLayerPerceptron(2, 2, 0.01, 0.01, 0.1);
-
+perceptron = MultiLayerPerceptron(2, 2, 0.01, 0.0, 0.1);
+X = [2 , 2];
+perceptron = perceptron.forwardProp(X);
 
 % Read the training data
 
