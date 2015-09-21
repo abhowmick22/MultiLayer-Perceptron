@@ -61,9 +61,10 @@ classdef MultiLayerPerceptron
            Bders = zeros(size(obj.biases));
            numPoints = size(activations, 3);
            for m=1:numPoints
-               deltas = computeDeltas(obj, activations, Y_train); 
+               sampleActivations = activations(:,:,m);
+               deltas = computeDeltas(obj, sampleActivations, Y_train); 
                %Wders(i,j,l) = Wders(i,j,l) + activations(i,l,m) * deltas(j,l);
-               Wders = Wders + activations(:,:,m) * transpose(deltas);
+               Wders = Wders + sampleActivations * transpose(deltas);
                %Bders(i,l) = Bders(i,l) + deltas(i,l);
                Bders = Bders + deltas;
            end
@@ -72,8 +73,19 @@ classdef MultiLayerPerceptron
        end
        
        % Compute deltas, for output units that are not input
-       function deltas = computeDeltas(obj, activations, Y_train)
+       function deltas = computeDeltas(obj, sampleActivations, Y_train)
            deltas = zeros(obj.widthLayer, obj.nbrLayers);
+           % delta for the output layer
+           outputDims = size(Y_train, 1);
+           layerActivations = sampleActivations(1:outputDims, obj.nbrLayers+1);
+           deltas(1:outputDims, obj.nbrLayers) = - (Y_train - ...
+               layerActivations) .* sigmoidGradient();
+           % deltas for the hidden layers
+           for layer=obj.nbrLayers-1:-1:1
+              layerActivations = sampleActivations(:, layer);
+              deltas(:,layer) = (obj.weights(:,:,layer+1) * deltas(:,layer+1)) ...
+                  .* sigmoid(layerActivations);
+           end
        end
            
        % Update parameters
@@ -81,10 +93,13 @@ classdef MultiLayerPerceptron
        % @param Bders: partial derivative wrt bias
        % @output obj: perceptron with updated parameters
        function obj = updateWeights(obj, Wders, Bders)
-           
+           obj.weights = obj.weights - (obj.alpha .* Wders);
+           obj.biases = obj.biases - (obj.alpha .* Bders);
        end
        
        % Visualize hidden layers
+       function visualize(obj, activationStatistics)
     
+       end
    end 
 end
